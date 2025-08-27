@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Updates Admin — Osman Nuri Boz</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#0b1220" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      :root { --bg:#0b1220; --card:#0f1729; --text:#e6e9ef; --muted:#9aa3b2; --border:#22314f; --primary:#f59e0b; --accent:#fbbf24; --radius:12px; }
+      body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial}
+      .wrap{width:min(1100px,100% - 2rem);margin:2rem auto}
+      header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+      h1{margin:0;font-size:1.4rem}
+      .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem}
+      .row{display:grid;gap:.75rem;grid-template-columns:2fr 1fr 3fr 2fr 1fr}
+      .row input,.row textarea{width:100%;background:#0b1220;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:.5rem}
+      .row textarea{min-height:70px}
+      .muted{color:var(--muted)}
+      .list{display:grid;gap:.75rem;margin-top:1rem}
+      .toolbar{display:flex;gap:.5rem;flex-wrap:wrap}
+      button{background:linear-gradient(180deg, color-mix(in oklab, var(--primary) 92%, #b45309), color-mix(in oklab, var(--primary) 70%, #92400e));color:#0b1220;border:1px solid color-mix(in oklab, var(--primary) 60%, #92400e);padding:.5rem .7rem;border-radius:8px;font-weight:600;cursor:pointer}
+      button.secondary{background:transparent;color:var(--text);border:1px solid var(--border)}
+      button.warn{background:#ff5757;border-color:#ff8a8a;color:#0b1220}
+      table{width:100%;border-collapse:separate;border-spacing:0 8px}
+      th,td{padding:.5rem .6rem;text-align:left}
+      thead th{color:var(--muted);font-weight:600}
+      tbody tr{background:var(--card);border:1px solid var(--border)}
+      tbody tr td:first-child{border-top-left-radius:8px;border-bottom-left-radius:8px}
+      tbody tr td:last-child{border-top-right-radius:8px;border-bottom-right-radius:8px}
+      .actions{display:flex;gap:.4rem}
+      input[type="password"]{letter-spacing:.2em}
+      .pin{display:flex;gap:.5rem;align-items:center;margin-bottom:1rem}
+      .grid{display:grid;gap:1rem}
+      .two{grid-template-columns:1fr 1fr}
+      @media (max-width: 900px){ .row{grid-template-columns:1fr} .two{grid-template-columns:1fr} }
+      .help{font-size:.9rem}
+      .footer{margin-top:1.5rem;color:var(--muted);text-align:center}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Updates Admin</h1>
+        <div class="toolbar">
+          <button id="btnExport" title="Export JSON">Export</button>
+          <label class="secondary" style="display:inline-flex;align-items:center;gap:.4rem;padding:.45rem .7rem;border-radius:8px;border:1px solid var(--border);cursor:pointer">
+            <input id="fileImport" type="file" accept="application/json" hidden />
+            Import JSON
+          </label>
+          <button id="btnClear" class="warn" title="Clear local changes">Clear Local</button>
+        </div>
+      </header>
+
+      <section class="card grid two">
+        <div>
+          <div class="pin" style="display:none">
+            <label for="pin">PIN</label>
+            <input id="pin" type="password" placeholder="4+ digits" />
+            <button id="btnUnlock" class="secondary">Unlock</button>
+          </div>
+          <p class="help muted">This admin panel stores updates in your browser (localStorage). It does not require a backend. To publish, keep this browser's local data or export JSON and commit it to <code>assets/data/updates.json</code>.</p>
+        </div>
+        <div>
+          <label class="muted">Autoplay interval (ms)
+            <input id="interval" type="number" min="2000" step="500" value="6000" />
+          </label>
+          <div class="help muted">Site default is 6000 ms. Saved locally only.</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="toolbar" style="justify-content:space-between;align-items:center;margin-bottom:.5rem">
+          <strong>Items</strong>
+          <button id="btnAdd">Add Item</button>
+        </div>
+        <table aria-label="Updates list">
+          <thead>
+            <tr>
+              <th style="width:22%">Title</th>
+              <th style="width:18%">Published</th>
+              <th>Summary</th>
+              <th style="width:18%">Link</th>
+              <th style="width:20%">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </section>
+
+      <p class="footer">Local-only admin. Protect with a strong PIN and keep this URL private. Disallowed via robots.txt.</p>
+    </div>
+
+    <script>
+      (function(){
+        const PIN_KEY = 'updates_admin_pin';
+        const DATA_KEY = 'updates';
+        const INT_KEY = 'updates_interval';
+        const TOUCH_KEY = 'updates_touch';
+
+        const d = document;
+        const pinInput = d.getElementById('pin');
+        const tbody = d.getElementById('tbody');
+        const btnAdd = d.getElementById('btnAdd');
+        const btnUnlock = d.getElementById('btnUnlock');
+        const btnExport = d.getElementById('btnExport');
+        const btnClear = d.getElementById('btnClear');
+        const fileImport = d.getElementById('fileImport');
+        const intervalInput = d.getElementById('interval');
+
+        // Load interval
+        try { const savedInt = localStorage.getItem(INT_KEY); if (savedInt) intervalInput.value = savedInt; } catch{}
+        intervalInput.addEventListener('change', ()=>{ try{ localStorage.setItem(INT_KEY, String(Number(intervalInput.value)||6000)); }catch{} })
+
+        // PIN lock
+        const locked = () => false; // PIN disabled
+        function ensureUnlocked(){ return true; }
+        if (btnUnlock) {
+          btnUnlock.addEventListener('click', ()=>{ alert('PIN disabled. Editing is always enabled.'); });
+        }
+
+        function getData(){
+          try { const local = localStorage.getItem(DATA_KEY); if (local) return JSON.parse(local); } catch{}
+          return [];
+        }
+        function setData(data){
+          localStorage.setItem(DATA_KEY, JSON.stringify(data));
+          try { localStorage.setItem(TOUCH_KEY, String(Date.now())); } catch {}
+        }
+
+        function rowTemplate(item, idx){
+          return `<tr data-idx="${idx}">
+            <td><input name="title" value="${item.title||''}" /></td>
+            <td><input name="date" type="datetime-local" value="${(item.date||'').slice(0,16)}" /></td>
+            <td><input name="summary" value="${item.summary||''}" /></td>
+            <td><input name="link" value="${item.link||''}" placeholder="https://..." /></td>
+            <td class="actions">
+              <button class="secondary" data-action="up">↑</button>
+              <button class="secondary" data-action="down">↓</button>
+              <button class="secondary" data-action="save">Save</button>
+              <button class="warn" data-action="remove">Delete</button>
+            </td>
+          </tr>`
+        }
+
+        function render(){
+          const data = getData();
+          tbody.innerHTML = data.map(rowTemplate).join('');
+        }
+
+        btnAdd.addEventListener('click', ()=>{
+          if (!ensureUnlocked()) return;
+          const data = getData();
+          data.unshift({ title:'New update', date: new Date().toISOString().slice(0,16), displayDate:'', summary:'', link:'', linkText:'Read more' });
+          setData(data); render();
+        });
+
+        tbody.addEventListener('click', (e)=>{
+          const btn = e.target.closest('button');
+          if (!btn) return;
+          if (!ensureUnlocked()) return;
+          const tr = btn.closest('tr');
+          const idx = Number(tr.dataset.idx);
+          const data = getData();
+          const action = btn.dataset.action;
+          if (action === 'remove') { data.splice(idx,1); setData(data); render(); return; }
+          if (action === 'up' && idx>0) { const tmp = data[idx-1]; data[idx-1]=data[idx]; data[idx]=tmp; setData(data); render(); return; }
+          if (action === 'down' && idx < data.length-1) { const tmp = data[idx+1]; data[idx+1]=data[idx]; data[idx]=tmp; setData(data); render(); return; }
+          if (action === 'save') {
+            const title = tr.querySelector('input[name="title"]').value.trim();
+            const date = tr.querySelector('input[name="date"]').value;
+            const summary = tr.querySelector('input[name="summary"]').value.trim();
+            const link = tr.querySelector('input[name="link"]').value.trim();
+            data[idx] = {
+              title,
+              date,
+              displayDate: date,
+              summary,
+              link,
+              linkText: 'Read more'
+            };
+            setData(data); render();
+            // visual feedback
+            btn.disabled = true; const old = btn.textContent; btn.textContent = 'Saved'; setTimeout(()=>{ btn.disabled = false; btn.textContent = old; }, 900);
+          }
+        });
+
+        btnExport.addEventListener('click', ()=>{
+          const data = getData();
+          const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'updates.json';
+          a.click();
+          URL.revokeObjectURL(a.href);
+        });
+
+        btnClear.addEventListener('click', ()=>{
+          if (!ensureUnlocked()) return;
+          if (!confirm('Clear local updates and interval?')) return;
+          localStorage.removeItem(DATA_KEY);
+          localStorage.removeItem(INT_KEY);
+          render();
+          alert('Local data cleared. Site will fall back to assets/data/updates.json');
+        });
+
+        fileImport.addEventListener('change', (e)=>{
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const json = JSON.parse(reader.result);
+              if (!Array.isArray(json)) throw new Error('JSON must be an array');
+              setData(json); render(); alert('Imported. Saved to localStorage.');
+            } catch (err) {
+              alert('Invalid JSON: ' + err.message);
+            }
+          };
+          reader.readAsText(file);
+          e.target.value = '';
+        });
+
+        render();
+      })();
+    </script>
+  </body>
+</html>

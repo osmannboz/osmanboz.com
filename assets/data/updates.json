@@ -1,0 +1,26 @@
+[
+  {
+    "title": "New Project: Atlas CMS",
+    "date": "2025-08-20",
+    "displayDate": "Aug 20, 2025",
+    "summary": "Headless CMS starter optimized for performance and accessibility. Supports MDX and image optimization.",
+    "link": "#",
+    "linkText": "Read more"
+  },
+  {
+    "title": "Case Study: Edge Monitor",
+    "date": "2025-07-05",
+    "displayDate": "Jul 5, 2025",
+    "summary": "Achieved 40% lower p95 latency via websocket batching and backpressure controls.",
+    "link": "#",
+    "linkText": "Read more"
+  },
+  {
+    "title": "Release: VisionCraft v1.1",
+    "date": "2025-06-10",
+    "displayDate": "Jun 10, 2025",
+    "summary": "Added WASM SIMD paths and improved image pipeline throughput by 25%.",
+    "link": "#",
+    "linkText": "Changelog"
+  }
+]

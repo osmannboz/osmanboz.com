@@ -1,0 +1,7 @@
+# robots.txt for Osman Nuri Boz Portfolio
+User-agent: *
+Allow: /
+Disallow: /admin.html
+
+# Update the URL below after deploying to your domain
+Sitemap: https://cervantesinteractive.com/sitemap.xml
