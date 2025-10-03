@@ -3,4 +3,4 @@ User-agent: *
 Disallow:
 
 # Sitemap dosyasının yolu
-Sitemap: https://osmanboz.com/sitemap.xml
+Sitemap: https://osmanboz.com/
