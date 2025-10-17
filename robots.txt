@@ -1,6 +1,2 @@
-# Tüm botlara izin ver
 User-agent: *
-Disallow:
-
-# Sitemap dosyasının yolu
-Sitemap: https://osmanboz.com/
+Disallow: /
