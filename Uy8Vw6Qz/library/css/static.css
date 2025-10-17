@@ -1,0 +1,122 @@
+header {
+    width: 100%;
+    z-index: 10;
+    position: fixed;
+    padding: 25px 75px;
+    align-items: center;
+    display: inline-flex;
+    background: transparent;
+    transition: background-color 0.5s ease;
+}
+
+header.scrolled {
+    background-color: #ffffff;
+    border-bottom: 0.5px solid #c4c8cb;
+}
+
+header a img {
+    width: 250px;
+    display: block;
+}
+
+header button {
+    display: none;
+}
+
+header nav {
+    margin-left: auto;
+}
+
+header nav ul {
+    gap: 25px;
+    display: flex;
+    list-style-type: none;
+}
+
+header nav ul li a {
+    color: #dddddd;
+    text-decoration: none;
+    transition: color 0.5s ease;
+}
+
+header.scrolled nav ul li a {
+    color: black;
+}
+
+header nav ul li a:hover {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+main .hero-section {
+    width: 100%;
+}
+
+main .hero-section img {
+    width: 100%;
+    height: 50vh;
+    object-fit: cover;
+}
+
+@media screen and (max-width: 1024px) {
+    header {
+        top: 0;
+        position: fixed;
+        padding: 25px 25px;
+        background-color: white;
+    }
+    
+    header a img {
+        width: 150px;
+    }
+
+    header button {
+        border: none;
+        display: block;
+        background: none;
+        margin-left: auto;
+    }
+
+    header button i {
+        font-size: 25px;
+        cursor: pointer;
+    }
+
+    header nav {
+        left: 0;
+        top: 84px;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        pointer-events: none;
+        background-color: white;
+        transform: translateX(100%);
+        border-top: 0.5px solid #c4c8cb;
+        transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+
+    header nav.active {
+        opacity: 1;
+        pointer-events: all;
+        transform: translateX(0);
+    }
+
+    header nav ul {
+        gap: 0;
+        flex-direction: column;
+    }
+
+    header nav ul li {
+        width: 100%;
+        padding: 20px;
+        border-bottom: 0.5px solid #c4c8cb;
+    }
+
+    header nav ul li a {
+        color: black;
+    }
+
+    header nav ul li a:hover {
+        color: #dddddd;
+    }
+}

@@ -1,0 +1,179 @@
+main .contact-section {
+    margin: 25px auto;
+    max-width: 1200px;
+}
+
+main .contact-section h2 {
+    position: relative;
+    padding-bottom: 10px;
+}
+
+main .contact-section h2::after {
+    content: '';
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 100px;
+    position: absolute;
+    background-color: black;
+}
+
+main .contact-section .contact-card {
+    gap: 25px;
+    display: grid;
+    margin-top: 25px;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+main .contact-section .contact-card .contact-item:last-child {
+    grid-column: 1 / -1;
+}
+
+main .contact-section .contact-card .contact-item {
+    display: flex;
+    padding: 25px;
+    align-items: center;
+    background-color: #ffffff;
+    border: 0.5px solid #c4c8cb;
+}
+
+main .contact-section .contact-card .contact-item i {
+    font-size: 25px;
+    margin-right: 25px;
+}
+
+main .contact-section form {
+    padding: 25px;
+    margin: 25px auto;
+    background-color: #ffffff;
+    border: 0.5px solid #c4c8cb;
+}
+
+
+main .contact-section form .form-success {
+    padding: 25px;
+    color: #ffffff;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    background-color: #28a745;
+}
+
+main .contact-section form .form-error {
+    padding: 25px;
+    color: #ffffff;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    background-color: #dc3545;
+}
+
+main .contact-section form label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+main .contact-section form input,
+main .contact-section form textarea {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 0.5px solid #c4c8cb;
+}
+
+main .contact-section form input:focus,
+main .contact-section form textarea:focus {
+    outline: none;
+    border-color: #0b5ed7;
+}
+
+main .contact-section form textarea {
+    min-height: 250px;
+}
+
+main .contact-section form button {
+    border: none;
+    width: 100%;
+    padding: 15px;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    background-color:#0d6efd;
+    transition: background-color 0.5s ease;
+}
+
+main .contact-section form button:hover {
+    background-color:#0b5ed7;
+}
+
+
+@media screen and (max-width: 1024px) {
+    header {
+        top: 0;
+        position: fixed;
+        padding: 25px 25px;
+        background-color: white;
+    }
+    
+    header a img {
+        width: 150px;
+    }
+
+    header button {
+        border: none;
+        display: block;
+        background: none;
+        margin-left: auto;
+    }
+
+    header button i {
+        font-size: 25px;
+        cursor: pointer;
+    }
+
+    header nav {
+        left: 0;
+        top: 84px;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        pointer-events: none;
+        background-color: white;
+        transform: translateX(100%);
+        border-top: 0.5px solid #c4c8cb;
+        transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+
+    header nav.active {
+        opacity: 1;
+        pointer-events: all;
+        transform: translateX(0);
+    }
+
+    header nav ul {
+        gap: 0;
+        flex-direction: column;
+    }
+
+    header nav ul li {
+        width: 100%;
+        padding: 20px;
+        border-bottom: 0.5px solid #c4c8cb;
+    }
+
+    header nav ul li a {
+        color: black;
+    }
+
+    header nav ul li a:hover {
+        color: #dddddd;
+    }
+
+    main .contact-section .contact-card {
+        grid-template-columns: 1fr;
+    }
+
+    main .contact-section .contact-card .contact-item {
+        text-align: center;
+        flex-direction: column;
+    }
+}
